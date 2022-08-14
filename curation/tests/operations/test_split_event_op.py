@@ -2,7 +2,7 @@ import json
 import pandas as pd
 import numpy as np
 import unittest
-from curation import SplitEventOp
+from curation import Dispatcher, SplitEventOp
 
 
 class Test(unittest.TestCase):
@@ -59,6 +59,7 @@ class Test(unittest.TestCase):
             "remove_parent_event": False
         }
         cls.json_parms = json.dumps(base_parameters)
+        cls.dispatch = Dispatcher([])
 
     @classmethod
     def tearDownClass(cls):
@@ -71,7 +72,7 @@ class Test(unittest.TestCase):
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_check = pd.DataFrame(self.split, columns=self.split_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, name="sample_data")
         df_new = df_new.fillna('n/a')
 
         # Test that df_new has the right values

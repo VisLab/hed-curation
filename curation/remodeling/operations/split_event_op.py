@@ -22,12 +22,13 @@ class SplitEventOp(BaseOp):
         self.new_events = parameters['new_events']
         self.remove_parent_event = parameters['remove_parent_event']
 
-    def do_op(self, df, hed_schema=None, sidecar=None):
+    def do_op(self, dispatcher, df, name, sidecar=None):
         """ Split a row representing a particular event into multiple rows.
 
         Args:
+            dispatcher (Dispatcher) - dispatcher object for context
             df (DataFrame) - The DataFrame to be remodeled.
-            hed_schema (HedSchema or HedSchemaGroup) Only needed for HED operations.
+            name (str) - Unique identifier for the dataframe -- often the original file path.
             sidecar (Sidecar or file-like)   Only needed for HED operations
 
         Returns:

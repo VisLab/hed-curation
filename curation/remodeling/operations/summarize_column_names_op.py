@@ -1,47 +1,35 @@
 from curation.remodeling.operations.base_op import BaseOp
 
-# TODO: Does not handle empty factor names.
-# TODO: Does not handle optional return columns.
 
 PARAMS = {
-    "command": "factor_column",
+    "command": "summarize_column_names",
     "required_parameters": {
-        "column_name": str,
-        "factor_values": list,
-        "factor_names": list
+        "summary_name": str,
+        "summary_path": str
     },
     "optional_parameters": {}
 }
 
 
-class FactorColumnOp(BaseOp):
+class SummarizeColumnNamesOp(BaseOp):
     """ Creates factor columns corresponding to values in specified column.
 
         Notes: The required parameters are:
-            - column_name (string)  The name of a column in the DataFrame.
+            - column_name (string)  The name of a column in the DataRrame.
             - factor_values (list)  Values in the column column_name to create factors for.
             - factor_names (list)   Names to use as the factor columns.
-
-        Raises:
-            ValueError:
-                - If lengths of factor_values and factor_names are not the same.
-                - If factor_name is already a column and overwrite_existing is False.
 
     """
 
     def __init__(self, parameters):
         super().__init__(PARAMS["command"], PARAMS["required_parameters"], PARAMS["optional_parameters"])
         self.check_parameters(parameters)
-        self.column_name = parameters['column_name']
-        self.factor_values = parameters['factor_values']
-        self.factor_names = parameters['factor_names']
-        if self.factor_names and len(self.factor_values) != len(self.factor_names):
-            raise ValueError("FactorNamesLenBad",
-                             f"The factor_names length {len(self.factor_names)} must be empty or equal" +
-                             f"to the factor_values length {len(self.factor_values)} .")
+        self.summary_name = parameters['summary_name']
+        self.summary_path = parameters['summary_path']
+        self.summary_info = {}
 
     def do_op(self, dispatcher, df, name, sidecar=None):
-        """ Create factor columns for values in a specified column.
+        """ Create factor columns corresponding to values in a specified column.
 
         Args:
             dispatcher (Dispatcher) - dispatcher object for context
@@ -51,8 +39,6 @@ class FactorColumnOp(BaseOp):
 
         Returns:
             DataFrame - a new DataFrame with the factor columns appended.
-
-
 
         """
 

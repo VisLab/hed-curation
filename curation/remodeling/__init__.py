@@ -6,11 +6,11 @@ from .operations.dispatcher import Dispatcher
 from .operations.add_structure_column_op import AddStructureColumnOp
 from .operations.add_structure_events_op import AddStructureEventsOp
 from .operations.add_structure_numbers_op import AddStructureNumbersOp
-from .operations.remap_columns import RemapColumnsOp
+from .operations.remap_columns_op import RemapColumnsOp
 from .operations.factor_column_op import FactorColumnOp
 from .operations.factor_hed_tags_op import FactorHedTagsOp
 from .operations.factor_hed_type_op import FactorHedTypeOp
-from .operations.merge_events_op import MergeEventsOp
+from .operations.merge_consecutive_op import MergeConsecutiveOp
 from .operations.remove_columns_op import RemoveColumnsOp
 from .operations.reorder_columns_op import ReorderColumnsOp
 from .operations.rename_columns_op import RenameColumnsOp

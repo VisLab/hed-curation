@@ -41,13 +41,14 @@ class FactorHedTypeOp(BaseOp):
                              f"{self.factor_encoding} is not in the allowed encodings: " +
                              f"{str(HedTypeFactors.ALLOWED_ENDCODINGS)}")
 
-    def do_op(self, df, hed_schema=None, sidecar=None):
+    def do_op(self, dispatcher, df, name, sidecar=None):
         """ Factor columns based on HED type.
 
         Args:
-            df (DataFrame) - The DataFrame whose rows are to be removed.
-            hed_schema (HedSchema or HedSchemaGroup) HED schema or schema group for this analysis..
-            sidecar (Sidecar or file-like)   Sidecar or file-like
+            dispatcher (Dispatcher) - dispatcher object for context
+            df (DataFrame) - The DataFrame to be remodeled.
+            name (str) - Unique identifier for the dataframe -- often the original file path.
+            sidecar (Sidecar or file-like)   Only needed for HED operations
 
         Returns
             DataFrame - a new DataFame with that includes the factors
@@ -60,13 +61,13 @@ class FactorHedTypeOp(BaseOp):
 
         """
 
-        input_data = TabularInput(df, hed_schema=hed_schema, sidecar=sidecar)
+        input_data = TabularInput(df, hed_schema=dispatcher.hed_schema, sidecar=sidecar)
         df = input_data.dataframe.copy()
         df_list = [df]
-        hed_strings = get_assembled_strings(input_data, hed_schema=hed_schema, expand_defs=False)
+        hed_strings = get_assembled_strings(input_data, hed_schema=dispatcher.hed_schema, expand_defs=False)
 
         def_mapper = input_data._def_mapper
-        var_manager = HedVariableManager(hed_strings, hed_schema, def_mapper)
+        var_manager = HedVariableManager(hed_strings, dispatcher.hed_schema, def_mapper)
         var_manager.add_type_variable(self.type_tag.lower())
 
         df_factors = var_manager.get_factor_vectors(self.type_tag, [], factor_encoding=self.factor_encoding)

@@ -1,7 +1,7 @@
 import json
 import pandas as pd
 import unittest
-from curation import RemapColumnsOp
+from curation import Dispatcher, RemapColumnsOp
 
 
 class Test(unittest.TestCase):
@@ -28,6 +28,7 @@ class Test(unittest.TestCase):
                 "ignore_missing": True
             }
         cls.json_parms = json.dumps(base_parameters)
+        cls.dispatch = Dispatcher([])
 
     @classmethod
     def tearDownClass(cls):
@@ -39,7 +40,7 @@ class Test(unittest.TestCase):
         op = RemapColumnsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         self.assertNotIn("response_type", df.columns, "remap_columns before does not have response_type column")
         self.assertIn("response_type", df_new.columns, "remap_columns after has response_type column")
 
@@ -53,7 +54,7 @@ class Test(unittest.TestCase):
         op = RemapColumnsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         self.assertNotIn("response_type", df.columns, "remap_columns before does not have response_type column")
         self.assertIn("response_type", df_new.columns, "remap_columns after has response_type column")
 
@@ -68,7 +69,7 @@ class Test(unittest.TestCase):
         op = RemapColumnsOp(parms)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         with self.assertRaises(ValueError):
-            df_new = op.do_op(df_test)
+            df_new = op.do_op(self.dispatch, df_test, 'sample_data')
 
 
 if __name__ == '__main__':

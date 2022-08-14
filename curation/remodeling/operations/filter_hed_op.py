@@ -51,7 +51,7 @@ class FactorHedTagsOp(BaseOp):
             self.expression_parsers.append(next_query)
 
     def do_op(self, dispatcher, df, name, sidecar=None):
-        """ Factor the column using HED tag queries.
+        """ Factor the column using HED tag queries
 
         Args:
             dispatcher (Dispatcher) - dispatcher object for context
@@ -68,9 +68,15 @@ class FactorHedTagsOp(BaseOp):
         hed_strings = get_assembled_strings(input_data, hed_schema=dispatcher.hed_schema, expand_defs=False)
         df_factors = pd.DataFrame(0, index=range(len(hed_strings)), columns=self.query_names)
         for parse_ind, parser in enumerate(self.expression_parsers):
-            for index, next_item in enumerate(hed_strings):
-                match = parser.search_hed_string(next_item)
-                if match:
-                    df_factors.at[index, self.query_names[parse_ind]] = 1
+            df_factors[self.query_names[parse_ind]] = self.get_query_factor(hed_strings, parser)
 
         return df_factors
+
+    @staticmethod
+    def get_query_factor(hed_strings, parser):
+        query_results = [0]*len(hed_strings)
+        for index, next_item in enumerate(hed_strings):
+            match = parser.search_hed_string(next_item)
+            if match:
+                query_results[index] = 1
+        return query_results

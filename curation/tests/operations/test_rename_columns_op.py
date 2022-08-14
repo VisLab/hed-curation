@@ -2,7 +2,7 @@ import json
 import pandas as pd
 import numpy as np
 import unittest
-from curation import RenameColumnsOp
+from curation import Dispatcher, RenameColumnsOp
 
 
 class Test(unittest.TestCase):
@@ -26,6 +26,7 @@ class Test(unittest.TestCase):
             "ignore_missing": True
         }
         cls.json_parms = json.dumps(base_parameters)
+        cls.dispatch = Dispatcher([])
 
     @classmethod
     def tearDownClass(cls):
@@ -37,7 +38,7 @@ class Test(unittest.TestCase):
         op = RenameColumnsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         renamed_columns = ['onset', 'duration', 'trial_type', 'stop_delay', 'response_time', 'response_accuracy',
                            'hand_used', 'image_sex']
         self.assertTrue(renamed_columns == list(df_new.columns),
@@ -59,7 +60,7 @@ class Test(unittest.TestCase):
         op = RenameColumnsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         renamed_columns = ['onset', 'duration', 'trial_type', 'stop_delay', 'response_time', 'response_accuracy',
                            'hand_used', 'image_sex']
         self.assertTrue(renamed_columns == list(df_new.columns),
@@ -80,7 +81,7 @@ class Test(unittest.TestCase):
         op = RenameColumnsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         renamed_columns = ['onset', 'duration', 'trial_type', 'stop_delay', 'response_time', 'response_accuracy',
                            'hand_used', 'image_sex']
         self.assertTrue(renamed_columns == list(df_new.columns),
@@ -103,7 +104,7 @@ class Test(unittest.TestCase):
         op = RenameColumnsOp(parms)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         with self.assertRaises(KeyError):
-            op.do_op(df_test)
+            op.do_op(self.dispatch, df_test, 'sample_data')
 
 
 if __name__ == '__main__':

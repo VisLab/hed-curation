@@ -5,11 +5,11 @@ from curation.remodeling.util.bidsfiles import find_task_files,  rename_and_save
 from .remodeling.operations.add_structure_column_op import AddStructureColumnOp
 from .remodeling.operations.add_structure_events_op import AddStructureEventsOp
 from .remodeling.operations.add_structure_numbers_op import AddStructureNumbersOp
-from .remodeling.operations.remap_columns import RemapColumnsOp
+from .remodeling.operations.remap_columns_op import RemapColumnsOp
 from .remodeling.operations.factor_column_op import FactorColumnOp
 from .remodeling.operations.factor_hed_tags_op import FactorHedTagsOp
 from .remodeling.operations.factor_hed_type_op import FactorHedTypeOp
-from .remodeling.operations.merge_events_op import MergeEventsOp
+from .remodeling.operations.merge_consecutive_op import MergeConsecutiveOp
 from .remodeling.operations.remove_columns_op import RemoveColumnsOp
 from .remodeling.operations.remove_rows_op import RemoveRowsOp
 from .remodeling.operations.rename_columns_op import RenameColumnsOp

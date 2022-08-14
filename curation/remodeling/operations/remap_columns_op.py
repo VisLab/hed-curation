@@ -1,4 +1,3 @@
-import numpy as np
 import pandas as pd
 from curation.remodeling.operations.base_op import BaseOp
 from hed.tools import KeyMap
@@ -49,12 +48,13 @@ class RemapColumnsOp(BaseOp):
         key_map.update(key_df)
         return key_map
 
-    def do_op(self, df, hed_schema=None, sidecar=None):
+    def do_op(self, dispatcher, df, name, sidecar=None):
         """ Remap new columns from combinations of others.
 
         Args:
+            dispatcher (Dispatcher) - dispatcher object for context
             df (DataFrame) - The DataFrame to be remodeled.
-            hed_schema (HedSchema or HedSchemaGroup) Only needed for HED operations.
+            name (str) - Unique identifier for the dataframe -- often the original file path.
             sidecar (Sidecar or file-like)   Only needed for HED operations
 
         Returns:

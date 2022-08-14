@@ -2,7 +2,7 @@ import json
 import numpy as np
 import pandas as pd
 import unittest
-from curation import RemoveRowsOp
+from curation import RemoveRowsOp, Dispatcher
 
 
 class Test(unittest.TestCase):
@@ -27,6 +27,8 @@ class Test(unittest.TestCase):
             "remove_values": ["succesful_stop", "unsuccesful_stop"]
         }
         cls.json_parms = json.dumps(base_parameters)
+        cls.dispatch = Dispatcher([])
+
 
     @classmethod
     def tearDownClass(cls):
@@ -38,7 +40,7 @@ class Test(unittest.TestCase):
         op = RemoveRowsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         self.assertTrue(list(df.columns) == list(df_new.columns),
                         "remove_rows does not change the number of columns when all valid")
         df_result = pd.DataFrame(self.result_data, columns=self.sample_columns)
@@ -57,7 +59,7 @@ class Test(unittest.TestCase):
         op = RemoveRowsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         self.assertTrue(list(df.columns) == list(df_new.columns),
                         "remove_rows does not change the number of columns when bad values included")
         df_result = pd.DataFrame(self.result_data, columns=self.sample_columns)
@@ -76,7 +78,7 @@ class Test(unittest.TestCase):
         op = RemoveRowsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         self.assertTrue(list(df.columns) == list(df_new.columns),
                         "remove_rows does not change the number of columns when bad column")
 

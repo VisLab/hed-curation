@@ -1,13 +1,14 @@
 import numpy as np
 import pandas as pd
+from hed.schema import load_schema_version
 from curation.remodeling.operations.add_structure_column_op import AddStructureColumnOp
 from curation.remodeling.operations.add_structure_events_op import AddStructureEventsOp
 from curation.remodeling.operations.add_structure_numbers_op import AddStructureNumbersOp
-from curation.remodeling.operations.remap_columns import RemapColumnsOp
+from curation.remodeling.operations.remap_columns_op import RemapColumnsOp
 from curation.remodeling.operations.factor_column_op import FactorColumnOp
 from curation.remodeling.operations.factor_hed_tags_op import FactorHedTagsOp
 from curation.remodeling.operations.factor_hed_type_op import FactorHedTypeOp
-from curation.remodeling.operations.merge_events_op import MergeEventsOp
+from curation.remodeling.operations.merge_consecutive_op import MergeConsecutiveOp
 from curation.remodeling.operations.remove_columns_op import RemoveColumnsOp
 from curation.remodeling.operations.reorder_columns_op import ReorderColumnsOp
 from curation.remodeling.operations.remove_rows_op import RemoveRowsOp
@@ -22,7 +23,7 @@ dispatch = {
     'factor_column': FactorColumnOp,
     'factor_hed_tags': FactorHedTagsOp,
     'factor_hed_type': FactorHedTypeOp,
-    'merge_events': MergeEventsOp,
+    'merge_consecutive': MergeConsecutiveOp,
     'remap_columns': RemapColumnsOp,
     'remove_columns': RemoveColumnsOp,
     'remove_rows': RemoveRowsOp,
@@ -34,34 +35,38 @@ dispatch = {
 
 class Dispatcher:
 
-    def __init__(self, command_list):
-        com_list, errors = self.parse_commands(command_list)
+    def __init__(self, command_list, data_root=None, hed_versions=None):
+        self.data_root = data_root
+        op_list, errors = self.parse_commands(command_list)
         if errors:
-            raise ValueError("InvalidCommandList",
-                             f"Cannot create a dispatcher for a list of invalid remodeling commands")
-        self.command_list = com_list
+            these_errors = self.errors_to_str(errors, 'Dispatcher failed due to invalid commands')
+            raise ValueError("InvalidCommandList", f"{these_errors}")
+        self.parsed_ops = op_list
+        if hed_versions:
+            self.hed_schema = load_schema_version(hed_versions)
+        else:
+            self.hed_schema = None
+        self.context_dict = {}
 
-    def run_operations(self, df, hed_schema=None, sidecar=None):
-        """ Run the dispatcher commands on a dataframe.
+    def run_operations(self, filename, sidecar=None):
+        """ Run the dispatcher commands on a file.
 
         Args:
-            df (file-like or DataFrame)      The file or dataframe to be remodeled.
-            hed_schema (HedSchema or HedSchemaGroup) Only needed for HED operations.
+            filename (str)      Full path of the file to be remodeled.
             sidecar (Sidecar or file-like)   Only needed for HED operations
 
         """
 
         # string to functions
 
-        if not isinstance(df, pd.DataFrame):
-            try:
-                df = pd.read_csv(df, sep='\t')
-            except Exception as ex:
-                raise HedFileError("BadDataFrameFile",
-                                   f"{str(df)} does not correspond to a valid tab-separated value file", "")
+        try:
+            df = pd.read_csv(filename, sep='\t')
+        except Exception:
+            raise HedFileError("BadDataFrameFile",
+                               f"{str(filename)} does not correspond to a valid tab-separated value file", "")
         df = self.prep_events(df)
-        for operation in self.command_list:
-            df = operation.do_op(df, hed_schema=hed_schema, sidecar=sidecar)
+        for operation in self.op_list:
+            df = operation.do_op(self, df, filename, sidecar=sidecar)
         df = df.fillna('n/a')
         return df
 
@@ -104,8 +109,10 @@ class Dispatcher:
     def errors_to_str(messages, title="", sep='\n'):
         error_list = [0]*len(messages)
         for index, message in enumerate(messages):
-            error_list[index] = f"Command[{message['index']}] has error:{message['error_type']}" + \
-                f" with error code:{message['error_code']} and error msg:{message['error_msg']}"
+            error_list[index] = f"Command[{message.get('index', None)}] " + \
+                                f"has error:{message.get('error_type', None)}" + \
+                                f" with error code:{message.get('error_code', None)} " + \
+                                f" and error msg:{message.get('error_msg', None)}"
         errors = sep.join(error_list)
         if title:
             return title + sep + errors

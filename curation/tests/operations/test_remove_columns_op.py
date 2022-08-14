@@ -2,7 +2,7 @@ import json
 import numpy as np
 import pandas as pd
 import unittest
-from curation import RemoveColumnsOp
+from curation import Dispatcher, RemoveColumnsOp
 
 
 class Test(unittest.TestCase):
@@ -23,6 +23,7 @@ class Test(unittest.TestCase):
             "ignore_missing": True
         }
         cls.json_parms = json.dumps(base_parameters)
+        cls.dispatch = Dispatcher([])
 
     @classmethod
     def tearDownClass(cls):
@@ -34,9 +35,10 @@ class Test(unittest.TestCase):
         op = RemoveColumnsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         remaining_columns = ['onset', 'duration', 'trial_type', 'response_time', 'response_hand', 'sex']
-        self.assertTrue(remaining_columns == list(df_new.columns), "remove_columns resulting df should have correct columns")
+        self.assertTrue(remaining_columns == list(df_new.columns),
+                        "remove_columns resulting df should have correct columns")
         self.assertEqual(len(df_test), len(df_new),
                          "remove_columns should not change the number of events when no extras and ignored")
 
@@ -53,7 +55,7 @@ class Test(unittest.TestCase):
         op = RemoveColumnsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         remaining_columns = ['onset', 'duration', 'trial_type', 'response_time', 'response_hand', 'sex']
         self.assertTrue(remaining_columns == list(df_new.columns),
                         "remove_columns resulting df should have correct columns when extras ignored")
@@ -73,7 +75,7 @@ class Test(unittest.TestCase):
         op = RemoveColumnsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         remaining_columns = ['onset', 'duration', 'trial_type', 'response_time', 'response_hand', 'sex']
         self.assertTrue(remaining_columns == list(df_new.columns),
                         "remove_columns resulting df should have correct columns when no extras but not ignored")
@@ -95,7 +97,7 @@ class Test(unittest.TestCase):
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         with self.assertRaises(KeyError):
-            op.do_op(df_test),
+            op.do_op(self.dispatch, df_test, 'sample_data')
 
 
 if __name__ == '__main__':

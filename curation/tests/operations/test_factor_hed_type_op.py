@@ -1,11 +1,8 @@
 import os
 import json
-import pandas as pd
-import numpy as np
 import unittest
-import hed.schema as hedschema
 from curation.remodeling.operations.factor_hed_type_op import FactorHedTypeOp
-from hed import TabularInput
+from curation.remodeling.operations.dispatcher import Dispatcher
 
 
 class Test(unittest.TestCase):
@@ -27,7 +24,7 @@ class Test(unittest.TestCase):
             "factor_encoding": "one-hot"
         }
         cls.json_parms = json.dumps(base_parameters)
-        cls.hed_schema = hedschema.load_schema_version('8.1.0')
+        cls.dispatch = Dispatcher([], hed_versions=['8.1.0'])
 
     @classmethod
     def tearDownClass(cls):
@@ -37,7 +34,7 @@ class Test(unittest.TestCase):
         # Test correct when all valid and no unwanted information
         parms = json.loads(self.json_parms)
         op = FactorHedTypeOp(parms)
-        df_new = op.do_op(self.data_path, hed_schema=self.hed_schema, sidecar=self.json_path)
+        df_new = op.do_op(self.dispatch, self.data_path, 'subj2_run1', sidecar=self.json_path)
         self.assertEqual(len(df_new), 200, "factor_hed_type_op length is correct")
         self.assertEqual(len(df_new.columns), 20,  "factor_hed_type_op has correct number of columns")
 
@@ -57,7 +54,7 @@ class Test(unittest.TestCase):
         parms = json.loads(self.json_parms)
         parms["factor_encoding"] = "categorical"
         op = FactorHedTypeOp(parms)
-        df_new = op.do_op(self.data_path, hed_schema=self.hed_schema, sidecar=self.json_path)
+        df_new = op.do_op(self.dispatch, self.data_path, 'subj2_run1', sidecar=self.json_path)
         self.assertEqual(len(df_new), 200, "factor_hed_type_op length is correct when categorical encoding")
         self.assertEqual(len(df_new.columns), 13,
                          "factor_hed_type_op has correct number of columns when categorical encoding")

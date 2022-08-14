@@ -30,12 +30,13 @@ class ReorderColumnsOp(BaseOp):
         self.ignore_missing = parameters['ignore_missing']
         self.keep_others = parameters['keep_others']
 
-    def do_op(self, df, hed_schema=None, sidecar=None):
+    def do_op(self, dispatcher, df, name, sidecar=None):
         """ Reorder columns as specified in event dictionary.
 
        Args:
+            dispatcher (Dispatcher) - dispatcher object for context
             df (DataFrame) - The DataFrame to be remodeled.
-            hed_schema (HedSchema or HedSchemaGroup) Only needed for HED operations.
+            name (str) - Unique identifier for the dataframe -- often the original file path.
             sidecar (Sidecar or file-like)   Only needed for HED operations
 
         Returns:

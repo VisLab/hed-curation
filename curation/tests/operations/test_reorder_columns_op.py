@@ -2,7 +2,7 @@ import json
 import numpy as np
 import pandas as pd
 import unittest
-from curation import ReorderColumnsOp
+from curation import Dispatcher, ReorderColumnsOp
 
 
 class Test(unittest.TestCase):
@@ -43,6 +43,7 @@ class Test(unittest.TestCase):
         cls.reordered_keep_columns = ['onset', 'duration', 'response_time', 'trial_type',
                                       'stop_signal_delay', 'response_accuracy', 'response_hand', 'sex']
         cls.json_parms = json.dumps(base_parameters)
+        cls.dispatch = Dispatcher([])
 
     @classmethod
     def tearDownClass(cls):
@@ -54,7 +55,7 @@ class Test(unittest.TestCase):
         op = ReorderColumnsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         self.assertTrue(self.reordered_columns == list(df_new.columns),
                         "reorder_columns resulting df should have correct columns when no extras, no keep, and ignore")
         self.assertEqual(len(df), len(df_new),
@@ -77,7 +78,7 @@ class Test(unittest.TestCase):
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         num_test_rows = len(df_test)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         self.assertTrue(self.reordered_columns == list(df_new.columns),
                         "reorder_columns resulting df should have correct columns when extras, no keep, and ignore")
         self.assertEqual(num_test_rows, len(df_new),
@@ -100,7 +101,7 @@ class Test(unittest.TestCase):
         op = ReorderColumnsOp(parms)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         with self.assertRaises(ValueError):
-            op.do_op(df_test)
+            op.do_op(self.dispatch, df_test, 'sample_data')
 
     def test_valid_keep_others_ignore_missing(self):
         # Test extras, keep, ignore
@@ -110,7 +111,7 @@ class Test(unittest.TestCase):
         op = ReorderColumnsOp(parms)
         df = pd.DataFrame(self.sample_data, columns=self.sample_columns)
         df_test = pd.DataFrame(self.sample_data, columns=self.sample_columns)
-        df_new = op.do_op(df_test)
+        df_new = op.do_op(self.dispatch, df_test, 'sample_data')
         self.assertTrue(self.reordered_keep_columns == list(df_new.columns),
                         "reorder_columns resulting df should have correct columns when extras, keep, and ignore")
         self.assertEqual(len(df), len(df_new),
