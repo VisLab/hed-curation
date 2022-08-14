@@ -1,5 +1,4 @@
 from curation.remodeling.operations.base_op import BaseOp
-from curation.remodeling.util import structure, base
 
 PARAMS = {
     "command": "add_structure_column",

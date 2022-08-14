@@ -14,6 +14,7 @@ from curation.remodeling.operations.reorder_columns_op import ReorderColumnsOp
 from curation.remodeling.operations.remove_rows_op import RemoveRowsOp
 from curation.remodeling.operations.rename_columns_op import RenameColumnsOp
 from curation.remodeling.operations.split_event_op import SplitEventOp
+from curation.remodeling.operations.summarize_column_names_op import SummarizeColumnNamesOp
 from hed.errors import HedFileError
 
 dispatch = {
@@ -29,7 +30,8 @@ dispatch = {
     'remove_rows': RemoveRowsOp,
     'rename_columns': RenameColumnsOp,
     'reorder_columns': ReorderColumnsOp,
-    'split_event': SplitEventOp
+    'split_event': SplitEventOp,
+    'summarize_column_names': SummarizeColumnNamesOp
 }
 
 
@@ -65,7 +67,7 @@ class Dispatcher:
             raise HedFileError("BadDataFrameFile",
                                f"{str(filename)} does not correspond to a valid tab-separated value file", "")
         df = self.prep_events(df)
-        for operation in self.op_list:
+        for operation in self.parsed_ops:
             df = operation.do_op(self, df, filename, sidecar=sidecar)
         df = df.fillna('n/a')
         return df
@@ -85,6 +87,9 @@ class Dispatcher:
                 if "parameters" not in item:
                     raise KeyError("MissingParameters",
                                    f"Command {str(item)} does not have a parameters key")
+                if item["command"] not in dispatch:
+                    raise KeyError("CommandCanNotBeDispatched",
+                                   f"Command {item['command']} must be added to dispatch before it can be executed.")
                 new_command = dispatch[item["command"]](item["parameters"])
                 commands.append(new_command)
             except Exception as ex:
@@ -112,7 +117,7 @@ class Dispatcher:
             error_list[index] = f"Command[{message.get('index', None)}] " + \
                                 f"has error:{message.get('error_type', None)}" + \
                                 f" with error code:{message.get('error_code', None)} " + \
-                                f" and error msg:{message.get('error_msg', None)}"
+                                f"\n\terror msg:{message.get('error_msg', None)}"
         errors = sep.join(error_list)
         if title:
             return title + sep + errors

@@ -1,0 +1,10 @@
+[
+    {
+        "command": "summarize_column_names",
+        "description": "Summarize the column titles",
+        "parameters": {
+            "summary_name": "Column summary",
+            "summary_path": "D:/temp"
+        }
+    }
+]
