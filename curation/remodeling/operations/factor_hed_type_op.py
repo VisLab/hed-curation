@@ -41,14 +41,15 @@ class FactorHedTypeOp(BaseOp):
                              f"{self.factor_encoding} is not in the allowed encodings: " +
                              f"{str(HedTypeFactors.ALLOWED_ENDCODINGS)}")
 
-    def do_op(self, dispatcher, df, name, sidecar=None):
+    def do_op(self, dispatcher, df, name, sidecar=None, verbose=False):
         """ Factor columns based on HED type.
 
         Args:
             dispatcher (Dispatcher) - dispatcher object for context
             df (DataFrame) - The DataFrame to be remodeled.
             name (str) - Unique identifier for the dataframe -- often the original file path.
-            sidecar (Sidecar or file-like)   Only needed for HED operations
+            sidecar (Sidecar or file-like)   Only needed for HED operations.
+            verbose (bool) If True output informative messages during operation.
 
         Returns
             DataFrame - a new DataFame with that includes the factors

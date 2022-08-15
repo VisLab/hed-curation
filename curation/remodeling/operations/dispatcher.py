@@ -50,17 +50,19 @@ class Dispatcher:
             self.hed_schema = None
         self.context_dict = {}
 
-    def run_operations(self, filename, sidecar=None):
+    def run_operations(self, filename, sidecar=None, verbose=False):
         """ Run the dispatcher commands on a file.
 
         Args:
             filename (str)      Full path of the file to be remodeled.
-            sidecar (Sidecar or file-like)   Only needed for HED operations
+            sidecar (Sidecar or file-like)   Only needed for HED operations.
+            verbose (bool)  If True, output informative messages during execution.
 
         """
 
         # string to functions
-
+        if verbose:
+            print(f"Reading {filename}...")
         try:
             df = pd.read_csv(filename, sep='\t')
         except Exception:
@@ -68,7 +70,7 @@ class Dispatcher:
                                f"{str(filename)} does not correspond to a valid tab-separated value file", "")
         df = self.prep_events(df)
         for operation in self.parsed_ops:
-            df = operation.do_op(self, df, filename, sidecar=sidecar)
+            df = operation.do_op(self, df, filename, sidecar=sidecar, verbose=verbose)
         df = df.fillna('n/a')
         return df
 
