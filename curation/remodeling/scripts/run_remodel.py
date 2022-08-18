@@ -1,7 +1,6 @@
 import os
 import json
 import argparse
-from hed.schema import load_schema_version
 from hed.util import get_file_list
 from hed.tools import BidsDataset
 from curation.remodeling.operations.dispatcher import Dispatcher

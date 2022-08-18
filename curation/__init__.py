@@ -4,7 +4,7 @@ from curation.remodeling.util.bidsfiles import find_task_files,  rename_and_save
 
 from .remodeling.operations.add_structure_column_op import AddStructureColumnOp
 from .remodeling.operations.add_structure_events_op import AddStructureEventsOp
-from .remodeling.operations.add_structure_numbers_op import AddStructureNumbersOp
+from .remodeling.operations.number_rows_op import NumberRowsOp
 from .remodeling.operations.remap_columns_op import RemapColumnsOp
 from .remodeling.operations.factor_column_op import FactorColumnOp
 from .remodeling.operations.factor_hed_tags_op import FactorHedTagsOp
