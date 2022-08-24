@@ -1,7 +1,7 @@
 import os
 import json
 import argparse
-from hed.util import get_file_list
+from hed.tools import get_file_list, parse_bids_filename
 from hed.tools import BidsDataset
 from curation.remodeling.operations.dispatcher import Dispatcher
 
@@ -53,9 +53,13 @@ def run_direct_ops(dispatch, args):
     if verbose:
         print(f"Found {len(tabular_files)} files with suffix {args.file_suffix} and extensions {str(args.extensions)}")
     for file_path in tabular_files:
+        if args.task_names:
+            (suffix, ext, entity_dict) = parse_bids_filename(file_path)
+            task = entity_dict.get('task', None)
+            if not (task and task in args.task_names):
+                continue
         df = dispatch.run_operations(file_path, verbose=True)
         # eventually save the events_df.
-
 
 def main():
     parser = get_parser()
