@@ -2,7 +2,7 @@ import numpy as np
 from curation.remodeling.operations.base_op import BaseOp
 
 PARAMS = {
-    "command": "add_structure_numbers",
+    "command": "number_rows",
     "required_parameters": {
         "number_column_name": str
     },
@@ -63,7 +63,7 @@ class NumberRowsOp(BaseOp):
         df_new = df.copy()
         df_new[self.number_column_name] = np.nan
         if self.match_value:
-            filter = df_new[self.match_value['column']] == self.match_value['value']
+            filter = df[self.match_value['column']] == self.match_value['value']
             numbers = [*range(1, sum(filter)+1)]
             df_new.loc[filter, self.number_column_name] = numbers
         else:

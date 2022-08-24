@@ -6,6 +6,7 @@ from .operations.dispatcher import Dispatcher
 from .operations.add_structure_column_op import AddStructureColumnOp
 from .operations.add_structure_events_op import AddStructureEventsOp
 from .operations.number_rows_op import NumberRowsOp
+from .operations.number_groups_op import NumberGroupsOp
 from .operations.remap_columns_op import RemapColumnsOp
 from .operations.factor_column_op import FactorColumnOp
 from .operations.factor_hed_tags_op import FactorHedTagsOp

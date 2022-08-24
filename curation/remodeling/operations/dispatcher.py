@@ -4,6 +4,7 @@ from hed.schema import load_schema_version
 from curation.remodeling.operations.add_structure_column_op import AddStructureColumnOp
 from curation.remodeling.operations.add_structure_events_op import AddStructureEventsOp
 from curation.remodeling.operations.number_rows_op import NumberRowsOp
+from curation.remodeling.operations.number_groups_op import NumberGroupsOp
 from curation.remodeling.operations.remap_columns_op import RemapColumnsOp
 from curation.remodeling.operations.factor_column_op import FactorColumnOp
 from curation.remodeling.operations.factor_hed_tags_op import FactorHedTagsOp
@@ -20,7 +21,8 @@ from hed.errors import HedFileError
 dispatch = {
     'add_structure_columns': AddStructureColumnOp,
     'add_structure_events': AddStructureEventsOp,
-    'add_structure_numbers': NumberRowsOp,
+    'number_rows': NumberRowsOp,
+    'number_groups': NumberGroupsOp,
     'factor_column': FactorColumnOp,
     'factor_hed_tags': FactorHedTagsOp,
     'factor_hed_type': FactorHedTypeOp,

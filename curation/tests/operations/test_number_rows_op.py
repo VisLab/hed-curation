@@ -133,6 +133,35 @@ class Test(unittest.TestCase):
                                     [366.5186, 2.0084, "Stress_post", "n/a"]
                                     ]
 
+        cls.filter_overwritten_numbered_data = [[33.4228, 2.0084, "n/a"],
+                                                [36.9395, 0.5, 1],
+                                                [37.4395, 0.25, "n/a"],
+                                                [37.6895, 0.4083, "n/a"],
+                                                [38.0936, 0.0, "n/a"],
+                                                [38.0979, 0.5, 2],
+                                                [38.5979, 0.25, "n/a"],
+                                                [38.8479, 0.3, "n/a"],
+                                                [39.1435, 0.0, "n/a"],
+                                                [39.1479, 0.5, 3],
+                                                [115.6238, 0.25, "n/a"],
+                                                [115.8738, 0.3083, "n/a"],
+                                                [116.1782, 0.0, "n/a"],
+                                                [116.18220000000001, 0.0167, "n/a"],
+                                                [134.1619, 0.0, "n/a"],
+                                                [134.16570000000002, 2.0084, "n/a"],
+                                                [151.7409, 0.5, 4],
+                                                [152.241, 0.25, "n/a"],
+                                                [152.491, 0.2, "n/a"],
+                                                [152.691, 1.05, "n/a"],
+                                                [347.9184, 0.5, 5],
+                                                [348.4184, 0.25, "n/a"],
+                                                [348.6684, 0.4667, "n/a"],
+                                                [349.1281, 0.0, "n/a"],
+                                                [349.1351, 0.0167, "n/a"],
+                                                [366.5138, 0.0, "n/a"],
+                                                [366.5186, 2.0084, "n/a"]
+                                                ]
+
         base_parameters = {
             "number_column_name": "number"
         }
@@ -177,6 +206,12 @@ class Test(unittest.TestCase):
             "match_value": {"column": "code", "value": "stop_trial"}
         }
 
+        filter_overwrite_parameters = {
+            "number_column_name": "number",
+            "match_value": {"column": "number", "value": "40"},
+            "overwrite": True
+        }
+
         cls.json_parms = json.dumps(base_parameters)
 
         cls.json_overwrite_false_parms = json.dumps(overwrite_false_parameters)
@@ -188,6 +223,7 @@ class Test(unittest.TestCase):
         cls.json_filter_wrong_type_parameters = json.dumps(filter_wrong_type_parameters)
         cls.json_filter_missing_column_parameters = json.dumps(filter_missing_column_parameters)
         cls.json_filter_missing_value_parameters = json.dumps(filter_missing_value_parameters)
+        cls.json_filter_overwrite_parameters = json.dumps(filter_overwrite_parameters)
 
         cls.dispatcher = None
         cls.file_name = None
@@ -217,9 +253,9 @@ class Test(unittest.TestCase):
 
         # Test that df has not been changed by the op
         self.assertTrue(list(df.columns) == list(df_test.columns),
-                        "split_event should not change the input df columns")
+                        "number_rows should not change the input df columns")
         self.assertTrue(np.array_equal(df.to_numpy(), df_test.to_numpy()),
-                        "split_event should not change the input df values")
+                        "number_rows should not change the input df values")
 
     def test_existing_column_overwrite_false(self):
         # Test when existing column name is given with overwrite specified False
@@ -329,6 +365,31 @@ class Test(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "MissingMatchValue"):
             df_new = op.do_op(self.dispatcher, df_test, self.file_name)
+
+    def test_filter_overwrite(self):
+        # Test when specified filter value is not in event file
+        parms = json.loads(self.json_filter_overwrite_parameters)
+        op = NumberRowsOp(parms)
+        df = pd.DataFrame(self.sample_data, columns=self.existing_sample_columns)
+        df_test = pd.DataFrame(self.sample_data, columns=self.existing_sample_columns)
+        df_check = pd.DataFrame(self.filter_overwritten_numbered_data, columns=self.existing_sample_columns)
+        df_new = op.do_op(self.dispatcher, df_test, self.file_name)
+        df_new = df_new.fillna('n/a')
+
+        self.assertTrue(list(df_new.columns) == list(self.existing_sample_columns),
+                        "numbered_events should have expected columns")
+        self.assertTrue(len(df_new) == len(df_test),
+                        "numbered_events should have same length as original dataframe")
+        self.assertTrue(np.array_equal(df_new.to_numpy(), df_check.to_numpy()),
+                        "numbered_events should not differ from check")
+
+        # Test that df has not been changed by the op
+        self.assertTrue(list(df.columns) == list(df_test.columns),
+                        "split_event should not change the input df columns")
+        self.assertTrue(np.array_equal(df.to_numpy(), df_test.to_numpy()),
+                        "split_event should not change the input df values")
+
+
 
 
 if __name__ == '__main__':

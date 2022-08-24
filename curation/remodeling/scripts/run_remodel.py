@@ -35,7 +35,6 @@ def run_bids_ops(dispatch, args):
         print(f"Processing ")
     for events_obj in events.datafile_dict.values():
         if args.task_names and events_obj.get_entity('task') not in args.task_names:
-            continue
         sidecar_list = events.get_sidecars_from_path(events_obj)
         if sidecar_list:
             sidecar = events.sidecar_dict[sidecar_list[-1]].contents
@@ -44,7 +43,6 @@ def run_bids_ops(dispatch, args):
         df = dispatch.run_operations(events_obj.file_path, sidecar=sidecar, verbose=verbose)
         # Eventually decide what to do with the files
     return
-
 
 
 def run_direct_ops(dispatch, args):
