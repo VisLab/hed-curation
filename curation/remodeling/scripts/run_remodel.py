@@ -10,14 +10,14 @@ def get_parser():
     parser = argparse.ArgumentParser(description="Converts event files based on a json file specifying operations.")
     parser.add_argument("data_dir", help="Full path of dataset root directory.")
     parser.add_argument("-m", "--model-path", dest="json_remodel_path", help="Full path of the remodel file.")
-    parser.add_argument("-t", "--task-name", dest="task_name", help="The name of the task.")
+    parser.add_argument("-t", "--task-names", dest="task_names", nargs="*", default=[], help="The name of the task.")
     parser.add_argument("-e", "--extensions", nargs="*", default=['.tsv'], dest="extensions",
                         help="File extensions to allow in locating files.")
     parser.add_argument("-x", "--exclude-dirs", nargs="*", default=[], dest="exclude_dirs",
                         help="Directories names to exclude from search for files.")
     parser.add_argument("-f", "--file-suffix", dest="file_suffix", default='events',
                         help="Filename suffix including file type.")
-    parser.add_argument("-b", "--bids-format", dest="use_bids",
+    parser.add_argument("-b", "--bids-format", action='store_true', dest="use_bids",
                         help="If present, the dataset is in BIDS format with sidecars.")
     parser.add_argument("-v", "--verbose", action='store_true',
                         help="If present, output informative messages as computation progresses.")
@@ -25,7 +25,7 @@ def get_parser():
 
 
 def run_bids_ops(dispatch, args):
-    verbose = hasattr(args, 'verbose')
+    verbose = args.verbose
     bids = BidsDataset(dispatch.data_root, tabular_types=['events'], exclude_dirs=args.exclude_dirs)
     dispatch.hed_schema = bids.schema
     if verbose:
@@ -34,6 +34,8 @@ def run_bids_ops(dispatch, args):
     if verbose:
         print(f"Processing ")
     for events_obj in events.datafile_dict.values():
+        if args.task_names and events_obj.get_entity('task') not in args.task_names:
+            continue
         sidecar_list = events.get_sidecars_from_path(events_obj)
         if sidecar_list:
             sidecar = events.sidecar_dict[sidecar_list[-1]].contents
@@ -42,6 +44,7 @@ def run_bids_ops(dispatch, args):
         df = dispatch.run_operations(events_obj.file_path, sidecar=sidecar, verbose=verbose)
         # Eventually decide what to do with the files
     return
+
 
 
 def run_direct_ops(dispatch, args):
@@ -58,7 +61,7 @@ def run_direct_ops(dispatch, args):
 def main():
     parser = get_parser()
     args = parser.parse_args()
-    verbose = hasattr(args, 'verbose')
+    verbose = args.verbose
     command_path = os.path.realpath(args.json_remodel_path)
     if verbose:
         print(f"Data directory: {args.data_dir}\nCommand path: {command_path}")
@@ -72,7 +75,7 @@ def main():
     if not os.path.isdir(data_dir):
         raise ValueError("DataDirectoryDoesNotExist", f"The root data directory {data_dir} does not exist")
     dispatch = Dispatcher(commands, data_root=data_dir)
-    if hasattr(args, "bids_format"):
+    if args.use_bids:
         run_bids_ops(dispatch, args)
     else:
         run_direct_ops(dispatch, args)
