@@ -7,7 +7,7 @@ PARAMS = {
     "command": "summarize_column_headers",
     "required_parameters": {
         "summary_name": str,
-        "summary_path": str
+        "summary_filename": str
     },
     "optional_parameters": {
     }
@@ -30,7 +30,7 @@ class SummarizeColumnNamesOp(BaseOp):
         self.check_parameters(parameters)
         self.summary_type = 'column_headers'
         self.summary_name = parameters['summary_name']
-        self.summary_path = parameters['summary_path']
+        self.summary_filename = parameters['summary_filename']
 
     def do_op(self, dispatcher, df, name, sidecar=None, verbose=False):
         """ Create factor columns corresponding to values in a specified column.
@@ -49,7 +49,7 @@ class SummarizeColumnNamesOp(BaseOp):
 
         summary = dispatcher.context_dict.get(self.summary_name, None)
         if not summary:
-            summary = ColumnNameSummary(self.summary_type, self.summary_name, self.summary_path)
+            summary = ColumnNameSummary(self.summary_type, self.summary_name, self.summary_filename)
             dispatcher.context_dict[self.summary_name] = summary
         position = summary.update_context(list(df.columns))
         if name not in summary.file_dict:
@@ -64,8 +64,8 @@ class SummarizeColumnNamesOp(BaseOp):
 
 class ColumnNameSummary(BaseContext):
 
-    def __init__(self, summary_type, summary_name, summary_path):
-        super().__init__(summary_type, summary_name, summary_path)
+    def __init__(self, summary_type, summary_name, summary_filename):
+        super().__init__(summary_type, summary_name, summary_filename)
         self.file_dict = {}
         self.unique_headers = []
 
@@ -76,7 +76,7 @@ class ColumnNameSummary(BaseContext):
         self.unique_headers.append(column_names)
         return len(self.unique_headers) - 1
 
-    def get_summary(self, as_json=False):
+    def get_summary(self, as_json=False, verbose=True):
         summary = {'summary_name': self.context_name, 'summary_type': self.context_type,
                    'number_unique_column_headers': len(self.unique_headers), 'number_files': len(self.file_dict),
                    'column_patterns': []}

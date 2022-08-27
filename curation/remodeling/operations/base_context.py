@@ -3,14 +3,14 @@ import json
 
 class BaseContext:
 
-    def __init__(self, context_type, context_name, context_path):
+    def __init__(self, context_type, context_name, context_filename):
         self.context_type = context_type
         self.context_name = context_name
-        self.context_path = context_path
+        self.context_filename = context_filename
 
     def get_summary(self, as_json=False):
         summary = {'context_name': self.context_name, 'context_type': self.context_type,
-                   'context_path': self.context_path}
+                   'context_filename': self.context_filename}
         if as_json:
             return json.dumps(summary, indent=4)
         else:
@@ -27,5 +27,5 @@ class BaseContext:
             extra_info = []
         sum_str = sum_str + \
             [f"Context name: {summary['context_name']}", f"Context type: {summary['context_type']}",
-             f"Context path: {summary['context_path']}"] + extra_info
+             f"Context filename: {summary['context_filename']}"] + extra_info
         return '\n'.join(sum_str)

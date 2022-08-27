@@ -1,3 +1,4 @@
+import os
 import numpy as np
 import pandas as pd
 from hed.schema import load_schema_version
@@ -36,6 +37,7 @@ dispatch = {
     'summarize_column_names': SummarizeColumnNamesOp
 }
 
+REMODELING_SUMMARY_PATH = '/remodeling/summaries'
 
 class Dispatcher:
 
@@ -75,6 +77,13 @@ class Dispatcher:
             df = operation.do_op(self, df, filename, sidecar=sidecar, verbose=verbose)
         df = df.fillna('n/a')
         return df
+
+    # def save_summaries(self, formats, verbose=True, time_stamp=True):
+    #     if not self.context_dict:
+    #         return
+    #     summary_dir = os.path.join(self.data_root, self.REMODLING_SUMMARY_PATH)
+    #     for key, context in self.context_dict.items():
+
 
     @staticmethod
     def parse_commands(command_list):

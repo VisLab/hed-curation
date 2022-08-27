@@ -17,7 +17,7 @@ class Test(unittest.TestCase):
         cls.data1 = [[3.0, 0.5, 'go', 0.2 , 1.3], [5.0, 0.5, 'go', 0.2 , 1.3]]
         base_parameters = {
             "summary_name": "columns",
-            "summary_path": "./code/summary/column_names"
+            "summary_filename": "column_name_summary"
         }
         cls.json_parms = json.dumps(base_parameters)
 
