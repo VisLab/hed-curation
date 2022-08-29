@@ -37,6 +37,7 @@ dispatch = {
     'summarize_column_names': SummarizeColumnNamesOp
 }
 
+REMODELING_SUMMARY_PATH = '/remodeling/summaries'
 
 
 class Dispatcher:

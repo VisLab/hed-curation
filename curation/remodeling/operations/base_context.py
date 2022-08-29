@@ -18,8 +18,8 @@ class BaseContext:
             return summary
 
     def get_text_summary(self, verbose=True):
-        summary =  [f"Context name: {self.context_name}", f"Context type: {self.context_type}",
-                    f"Context filename: {self.context_filename}", self.get_summary(as_json=False)]
+        summary = [f"Context name: {self.context_name}", f"Context type: {self.context_type}",
+                   f"Context filename: {self.context_filename}", self.get_summary(as_json=False)]
         return 'n'.join(summary)
 
     def save(self, save_dir, file_formats, verbose=True):
@@ -30,7 +30,7 @@ class BaseContext:
             if file_format == '.txt':
                 summary = self.get_text_summary(verbose=verbose)
             elif file_format == '.json':
-                summary = self.get_summary(as_json=True, verbose=verbose)
+                summary = self.get_summary(as_json=True)
             else:
                 continue
 
