@@ -15,10 +15,12 @@ def get_parser():
                         help="File extensions to allow in locating files.")
     parser.add_argument("-x", "--exclude-dirs", nargs="*", default=[], dest="exclude_dirs",
                         help="Directories names to exclude from search for files.")
-    parser.add_argument("-f", "--file-suffix", dest="file_suffix", default='events',
-                        help="Filename suffix including file type.")
+    parser.add_argument("-f", "--file-suffix", dest="file_suffix", default='events.tsv',
+                        help="Filename suffix including file type of items to be analyzed (events.tsv by default).")
+    parser.add_argument("-s", "--save-formats", nargs="*", default=['.json', '.txt'], dest="save_formats",
+                        help="Format for saving any summaries, if any. If empty, then no summaries are saved.")
     parser.add_argument("-b", "--bids-format", action='store_true', dest="use_bids",
-                        help="If present, the dataset is in BIDS format with sidecars.")
+                        help="If present, the dataset is in BIDS format with sidecars. HED analysis is available.")
     parser.add_argument("-v", "--verbose", action='store_true',
                         help="If present, output informative messages as computation progresses.")
     return parser
@@ -83,9 +85,14 @@ def main():
     else:
         run_direct_ops(dispatch, args)
 
+    if not args.save_formats:
+        return
+    summary_path = dispatch.get_remodel_save_dir()
+    os.makedirs(summary_path, exist_ok=True)
     for context_name, context_item in dispatch.context_dict.items():
-        print(f"\n{context_item.get_text_summary(title=context_name)}")
-    print("to_here")
+        if verbose:
+            print(f"\n{context_item.get_text_summary(title=context_name)}", verbose=verbose)
+        context_item.save(summary_path, args.save_formats, verbose=verbose)
 
 
 if __name__ == '__main__':

@@ -3,8 +3,8 @@
         "command": "summarize_column_names",
         "description": "Summarize the column titles",
         "parameters": {
-            "summary_name": "Column summary",
-            "summary_path": "D:/temp"
+            "summary_name": "Column header summary",
+            "summary_filename": "column_header_summary"
         }
     }
 ]

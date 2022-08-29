@@ -37,9 +37,10 @@ dispatch = {
     'summarize_column_names': SummarizeColumnNamesOp
 }
 
-REMODELING_SUMMARY_PATH = '/remodeling/summaries'
+
 
 class Dispatcher:
+    REMODELING_SUMMARY_PATH = 'remodeling/summaries'
 
     def __init__(self, command_list, data_root=None, hed_versions=None):
         self.data_root = data_root
@@ -53,6 +54,9 @@ class Dispatcher:
         else:
             self.hed_schema = None
         self.context_dict = {}
+
+    def get_remodel_save_dir(self):
+        return os.path.realpath(os.path.join(self.data_root, Dispatcher.REMODELING_SUMMARY_PATH))
 
     def run_operations(self, filename, sidecar=None, verbose=False):
         """ Run the dispatcher commands on a file.
