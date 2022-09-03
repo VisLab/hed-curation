@@ -18,8 +18,8 @@ class SummarizeColumnNamesOp(BaseOp):
     """ Summarize the column headers in a dataset.
 
     Notes: The required parameters are:
-        - summary_name (str)   The name of the summary.
-        - summary_path (str)   Full path of the data -- must be unique across the dataset.
+        - summary_name (str)       The name of the summary.
+        - summary_filename (str)   Base filename of the summary.
 
     The purpose of this is to check that all of the dataframes have the same columns in same order.
 
@@ -45,11 +45,14 @@ class SummarizeColumnNamesOp(BaseOp):
         Returns:
             DataFrame - a new DataFrame with the factor columns appended.
 
+        Side-effect:
+            Updates the context
+
         """
 
         summary = dispatcher.context_dict.get(self.summary_name, None)
         if not summary:
-            summary = ColumnNameSummary(self.summary_type, self.summary_name, self.summary_filename)
+            summary = ColumnNameSummary(self)
             dispatcher.context_dict[self.summary_name] = summary
         position = summary.update_context(list(df.columns))
         if name not in summary.file_dict:
@@ -64,8 +67,8 @@ class SummarizeColumnNamesOp(BaseOp):
 
 class ColumnNameSummary(BaseContext):
 
-    def __init__(self, summary_type, summary_name, summary_filename):
-        super().__init__(summary_type, summary_name, summary_filename)
+    def __init__(self, sum_op):
+        super().__init__(sum_op.summary_type, sum_op.summary_name, sum_op.summary_filename)
         self.file_dict = {}
         self.unique_headers = []
 
@@ -77,9 +80,10 @@ class ColumnNameSummary(BaseContext):
         return len(self.unique_headers) - 1
 
     def get_summary(self, as_json=False, verbose=True):
-        summary = {'summary_name': self.context_name, 'summary_type': self.context_type,
-                   'number_unique_column_headers': len(self.unique_headers), 'number_files': len(self.file_dict),
-                   'column_patterns': []}
+        summary = super().get_summary(as_json=False, verbose=verbose)
+        summary['number_unique_column_headers'] = len(self.unique_headers)
+        summary['number_files'] = len(self.file_dict)
+        summary['column_patterns'] = []
         patterns = [ list() for element in self.unique_headers]
 
         for key, value in self.file_dict.items():
@@ -94,15 +98,11 @@ class ColumnNameSummary(BaseContext):
             return summary
 
     def get_text_summary(self, title='', verbose=True):
+        sum_str = super().get_text_summary(title=title, verbose=verbose)
         summary = self.get_summary(as_json=False)
-        sum_str = []
-        if title:
-            sum_str = [title]
-        sum_str = sum_str + \
-                  [f"Summary name: {summary['summary_name']}",
-                   f"Summary type: {summary['summary_type']}",
-                   f"Number unique column headers: {summary['number_unique_column_headers']}",
-                   f"Column headers:"]
+
+        sum_str = sum_str + '\n'.join([f"Number unique column headers: {summary['number_unique_column_headers']}",
+                                       f"Column headers:"])
 
         sum_details = [0]*len(summary['column_headers'])
         for index, header in summary['column_headers'].items():
@@ -112,5 +112,5 @@ class ColumnNameSummary(BaseContext):
                 files = [f"\t\t{a_file}" for a_file in header['file_list']]
                 file_str = '\n' + ('\n').join(files)
             sum_details[index] = header_str + file_str
-        return ('\n').join(sum_str) + '\n' + ('\n').join(sum_details)
+        return '\n'.join(sum_str) + '\n' + '\n'.join(sum_details)
 

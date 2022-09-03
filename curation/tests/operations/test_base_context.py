@@ -28,8 +28,6 @@ class Test(unittest.TestCase):
         self.assertIsInstance(summary3, str, "get_text_summary returns a str if verbose is False")
         summary4 = base_con.get_text_summary()
         self.assertIsInstance(summary4, str, "get_text_summary returns a str by default")
-        self.assertGreater(len(summary4), len(summary3),
-                           "get_text_summary returns a longer string by default then when verbose is False")
         summary5 = base_con.get_text_summary(verbose=True)
         self.assertIsInstance(summary5, str, "get_text_summary returns a str with verbose True")
         self.assertEqual(summary4, summary5, "get_text_summary string is same when verbose omitted or True")

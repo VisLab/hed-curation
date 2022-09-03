@@ -6,5 +6,16 @@
             "summary_name": "Column header summary",
             "summary_filename": "column_header_summary"
         }
+    },
+    {
+        "command": "summarize_column_values",
+        "description": "Summarize the counts of the unique values in the specified columns",
+        "parameters": {
+            "summary_name": "Column value summary",
+            "summary_filename": "column_value_summary",
+            "skip_columns": ["onset", "sample", "response_time"],
+            "value_columns": [],
+            "task_names": []
+        }
     }
 ]

@@ -17,6 +17,8 @@ from curation.remodeling.operations.remove_rows_op import RemoveRowsOp
 from curation.remodeling.operations.rename_columns_op import RenameColumnsOp
 from curation.remodeling.operations.split_event_op import SplitEventOp
 from curation.remodeling.operations.summarize_column_names_op import SummarizeColumnNamesOp
+from curation.remodeling.operations.summarize_column_values_op import SummarizeColumnValuesOp
+from curation.remodeling.operations.summarize_hed_type_op import SummarizeHedTypeOp
 from hed.errors import HedFileError
 
 dispatch = {
@@ -34,14 +36,14 @@ dispatch = {
     'rename_columns': RenameColumnsOp,
     'reorder_columns': ReorderColumnsOp,
     'split_event': SplitEventOp,
-    'summarize_column_names': SummarizeColumnNamesOp
+    'summarize_column_names': SummarizeColumnNamesOp,
+    'summarize_column_values': SummarizeColumnValuesOp,
+    'summarize_hed_type': SummarizeHedTypeOp
 }
-
-REMODELING_SUMMARY_PATH = '/remodeling/summaries'
 
 
 class Dispatcher:
-    REMODELING_SUMMARY_PATH = 'remodeling/summaries'
+    REMODELING_SUMMARY_PATH = 'derivatives/remodel/summaries'
 
     def __init__(self, command_list, data_root=None, hed_versions=None):
         self.data_root = data_root
@@ -83,12 +85,15 @@ class Dispatcher:
         df = df.fillna('n/a')
         return df
 
-    # def save_summaries(self, formats, verbose=True, time_stamp=True):
-    #     if not self.context_dict:
-    #         return
-    #     summary_dir = os.path.join(self.data_root, self.REMODLING_SUMMARY_PATH)
-    #     for key, context in self.context_dict.items():
-
+    def save_context(self, save_formats, verbose=True):
+        if not save_formats:
+            return
+        summary_path = self.get_remodel_save_dir()
+        os.makedirs(summary_path, exist_ok=True)
+        for context_name, context_item in self.context_dict.items():
+            if verbose:
+                print(f"\n{context_item.get_text_summary(title=context_name)}")
+            context_item.save(summary_path, save_formats, verbose=verbose)
 
     @staticmethod
     def parse_commands(command_list):

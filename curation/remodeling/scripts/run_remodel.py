@@ -85,14 +85,7 @@ def main():
     else:
         run_direct_ops(dispatch, args)
 
-    if not args.save_formats:
-        return
-    summary_path = dispatch.get_remodel_save_dir()
-    os.makedirs(summary_path, exist_ok=True)
-    for context_name, context_item in dispatch.context_dict.items():
-        if verbose:
-            print(f"\n{context_item.get_text_summary(title=context_name)}", verbose=verbose)
-        context_item.save(summary_path, args.save_formats, verbose=verbose)
+    dispatch.save_context(args.save_formats)
 
 
 if __name__ == '__main__':

@@ -80,7 +80,9 @@ class Test(unittest.TestCase):
         self.assertEqual(summary4, summary5, "get_text_summary string is same when verbose omitted or True")
 
     def test_context_get_name_group(self):
-        context = ColumnNameSummary('column_names', 'column_name_summary', './derivatives/summaries/')
+        parms = json.loads(self.json_parms)
+        sum_op = SummarizeColumnNamesOp(parms)
+        context = ColumnNameSummary(sum_op)
         update1 = context.update_context(self.sample_columns1)
         self.assertEqual(update1, 0, "update_context has first item at position 0")
         self.assertEqual(len(context.unique_headers), 1, "update_context has 1 unique item after first insertion")
