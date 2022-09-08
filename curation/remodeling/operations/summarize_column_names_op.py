@@ -79,38 +79,31 @@ class ColumnNameSummary(BaseContext):
         self.unique_headers.append(column_names)
         return len(self.unique_headers) - 1
 
-    def get_summary(self, as_json=False, verbose=True):
-        summary = super().get_summary(as_json=False, verbose=verbose)
-        summary['number_unique_column_headers'] = len(self.unique_headers)
-        summary['number_files'] = len(self.file_dict)
-        summary['column_patterns'] = []
+    def get_summary_details(self, verbose=True):
         patterns = [ list() for element in self.unique_headers]
-
         for key, value in self.file_dict.items():
             patterns[value].append(key)
         column_headers = {}
         for index, pattern in enumerate(patterns):
             column_headers[index] = {'column_header': self.unique_headers[index], 'file_list': patterns[index]}
-        summary['column_headers'] = column_headers
-        if as_json:
-            return json.dumps(summary, indent=4)
-        else:
-            return summary
+        summary = {'number_unique_column_headers': len(self.unique_headers),
+                   'number_files': len(self.file_dict), 'column_patterns': column_headers}
+        return summary
 
-    def get_text_summary(self, title='', verbose=True):
-        sum_str = super().get_text_summary(title=title, verbose=verbose)
-        summary = self.get_summary(as_json=False)
-
-        sum_str = sum_str + '\n'.join([f"Number unique column headers: {summary['number_unique_column_headers']}",
-                                       f"Column headers:"])
-
-        sum_details = [0]*len(summary['column_headers'])
-        for index, header in summary['column_headers'].items():
-            header_str = f"\t{str(header['column_header'])} has {len(header['file_list'])} files"
-            file_str = ''
-            if verbose:
-                files = [f"\t\t{a_file}" for a_file in header['file_list']]
-                file_str = '\n' + ('\n').join(files)
-            sum_details[index] = header_str + file_str
-        return '\n'.join(sum_str) + '\n' + '\n'.join(sum_details)
+    # def get_text_summary(self, title='', verbose=True):
+    #     sum_str = super().get_text_summary(title=title, verbose=verbose)
+    #     summary = self.get_summary(as_json=False)
+    #
+    #     sum_str = sum_str + '\n'.join([f"Number unique column headers: {summary['number_unique_column_headers']}",
+    #                                    f"Column headers:"])
+    #
+    #     sum_details = [0]*len(summary['column_headers'])
+    #     for index, header in summary['column_headers'].items():
+    #         header_str = f"\t{str(header['column_header'])} has {len(header['file_list'])} files"
+    #         file_str = ''
+    #         if verbose:
+    #             files = [f"\t\t{a_file}" for a_file in header['file_list']]
+    #             file_str = '\n' + ('\n').join(files)
+    #         sum_details[index] = header_str + file_str
+    #     return '\n'.join(sum_str) + '\n' + '\n'.join(sum_details)
 

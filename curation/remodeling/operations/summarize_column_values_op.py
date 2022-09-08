@@ -65,7 +65,7 @@ class SummarizeColumnValuesOp(BaseOp):
         if not summary:
             summary = ColumnValueSummary(self)
             dispatcher.context_dict[self.summary_name] = summary
-        summary.update_context(df)
+        summary.update_context({'df': df})
         return df
 
 
@@ -77,17 +77,8 @@ class ColumnValueSummary(BaseContext):
                                       name=sum_op.summary_name)
         self.task_names = sum_op.task_names
 
-    def update_context(self, df):
-        self.summary.update(df)
+    def update_context(self, new_context):
+        self.summary.update(new_context['df'])
 
-    def get_summary(self, as_json=False, verbose=True):
-        ret_sum = super().get_summary(as_json=False, verbose=verbose)
-        ret_sum['summary'] = self.summary.get_summary(as_json=False)
-        if as_json:
-            return json.dumps(ret_sum, indent=4)
-        else:
-            return ret_sum
-
-    def get_text_summary(self, title='', verbose=True):
-        sum_str = super().get_text_summary(title=title, verbose=verbose)
-        return sum_str + '\n' + self.get_summary(as_json=True, verbose=verbose).replace('"', '')
+    def get_summary_details(self, verbose=True):
+        return self.summary.get_summary(as_json=False)

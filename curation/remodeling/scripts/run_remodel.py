@@ -43,6 +43,7 @@ def run_bids_ops(dispatch, args):
             sidecar = events.sidecar_dict[sidecar_list[-1]].contents
         else:
             sidecar = None
+        print(f"Events {events_obj.file_path}  sidecar {sidecar}")
         df = dispatch.run_operations(events_obj.file_path, sidecar=sidecar, verbose=verbose)
         # Eventually decide what to do with the files
     return

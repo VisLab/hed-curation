@@ -86,13 +86,20 @@ class Dispatcher:
         return df
 
     def save_context(self, save_formats, verbose=True):
+        """ Save the summary files in the specified formats.
+
+        Args:
+            save_formats (list) list of formats [".txt", ."json"]
+            verbose (bool) If include additional details
+
+        The summaries are saved in the dataset derivatives/remodeling folder.
+
+        """
         if not save_formats:
             return
         summary_path = self.get_remodel_save_dir()
         os.makedirs(summary_path, exist_ok=True)
         for context_name, context_item in self.context_dict.items():
-            if verbose:
-                print(f"\n{context_item.get_text_summary(title=context_name)}")
             context_item.save(summary_path, save_formats, verbose=verbose)
 
     @staticmethod

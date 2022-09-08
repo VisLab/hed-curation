@@ -67,8 +67,8 @@ class FactorHedTypeOp(BaseOp):
         df_list = [df]
         hed_strings = get_assembled_strings(input_data, hed_schema=dispatcher.hed_schema, expand_defs=False)
 
-        def_mapper = input_data._def_mapper
-        var_manager = HedVariableManager(hed_strings, dispatcher.hed_schema, def_mapper)
+        definitions = input_data.get_definitions()
+        var_manager = HedVariableManager(hed_strings, dispatcher.hed_schema, definitions)
         var_manager.add_type_variable(self.type_tag.lower())
 
         df_factors = var_manager.get_factor_vectors(self.type_tag, [], factor_encoding=self.factor_encoding)

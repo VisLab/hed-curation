@@ -56,7 +56,6 @@ class SummarizeHedTypeOp(BaseOp):
             Updates the context
 
         """
-
         summary = dispatcher.context_dict.get(self.summary_name, None)
         if not summary:
             summary = HedTypeSummary(self)
@@ -67,7 +66,7 @@ class SummarizeHedTypeOp(BaseOp):
         var_manager = HedVariableManager(hed_strings, dispatcher.hed_schema, definitions)
         var_manager.add_type_variable(self.type_tag)
         var_map = var_manager.get_type_variable(self.type_tag)
-        summary.update_context(var_map)
+        summary.update_context({"update": var_map})
         return df
 
 
@@ -78,18 +77,23 @@ class HedTypeSummary(BaseContext):
         self.variable_type = sum_op.type_tag
         self.summary = HedVariableSummary(variable_type=sum_op.type_tag)
 
-    def update_context(self, type, var_map):
-        if type == self.variable_type:
-            self.summary.update_summary(var_map)
+    def update_context(self, new_context):
+        self.summary.update_summary(new_context["update"])
 
-    def get_summary(self, as_json=False, verbose=True):
-        summary = super().get_summary(as_json=False, verbose=verbose)
-        summary['summary'] = self.summary.get_summary()
-        if as_json:
-            return json.dumps(summary, indent=4)
-        else:
-            return summary
+    def get_summary_details(self, verbose=True):
+        return self.summary.get_summary(as_json=False)
 
-    def get_text_summary(self, title='', verbose=True):
-        sum_str = super().get_text_summary(title=title, verbose=verbose)
-        return sum_str + '\n' + self.get_summary(as_json=True, verbose=verbose).replace('"', '')
+    # def get_summary(self, as_json=False, verbose=True):
+    #     summary = super().get_summary(as_json=False, verbose=verbose)
+    #     summary['summary'] = self.get_summary_details
+    #     if as_json:
+    #         return json.dumps(summary, indent=4)
+    #     else:
+    #         return summary
+    #
+    # def get_text_summary(self, title='', verbose=True):
+    #     sum_str = super().get_text_summary(title=title, verbose=verbose)
+    #     summary = self.get_summary(as_json=False, verbose=verbose)
+    #     summary_details = json.dumps(summary['summary'], indent=4)
+    #     summary_details = summary_details.replace('"', '').replace('{', '').replace('}', '').replace(',', '')
+    #     return sum_str + '\n' + 'Summary:' +'\n' + summary_details
